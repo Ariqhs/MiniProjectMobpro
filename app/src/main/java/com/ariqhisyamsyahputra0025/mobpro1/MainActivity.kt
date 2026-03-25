@@ -1,12 +1,10 @@
 package com.ariqhisyamsyahputra0025.mobpro1
 
-import android.content.pm.ConfigurationInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -31,14 +29,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-        Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
-    }
-
     @Preview(showBackground = true)
     @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
     @Composable
@@ -50,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun MainScreen() {;
+    fun MainScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
