@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Mobpro 1</string>
+    <string name="bagikan">Bagikan</string>
+    <string name="bagikan_template">Panjang: %1$scm\nLebar: %2$scm\nLuas %3$.2scm\nKeliling %4$.2scm</string>
+    <string name="tentang_aplikasi">Tentang Aplikasi</string>
+    <string name="copyright">Hitung bangun datar merupakan sebuah aplikasi Android untuk menghitung keliling dan luas bangun datar sehingga seseorang dapat mengetahui keliling dan luas bangun datar.\n\nAplikasi ini dibuat untuk memenuhi tugas mata kuliah Mobpro.\n\nCopyright c 2026 Ariq Hisyam SYahputra.\nAll rights reserved.</string>
+    <string name="kembali">Kembali</string>
 </resources>

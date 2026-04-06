@@ -1,5 +1,9 @@
 package com.ariqhisyamsyahputra0025.mobpro1.ui.screen
 
+import android.R.id.message
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,10 +16,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -31,30 +37,55 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.ariqhisyamsyahputra0025.mobpro1.R
+import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
+import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
+
+@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    Mobpro1Theme {
+        MainScreen(rememberNavController())
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Hitung Bangun Datar")
+                    Text(text = stringResource(id = R.string.app_name))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
-                )
+                ),
+                actions = {
+                    IconButton(onClick = {navController.navigate(Screen.About.route)}) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = stringResource(R.string.tentang_aplikasi),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             )
         }
     ) { innerPadding ->
         ScreenContent(Modifier.padding(innerPadding))
     }
 }
-
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
     var panjang by remember { mutableStateOf("") }
@@ -65,7 +96,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 
     var panjangError by remember { mutableStateOf(false) }
     var lebarError by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -148,8 +179,8 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 Text(text = "Reset")
             }
         }
-
         if (luas != 0f) {
+            val message = stringResource(R.string.bagikan_template, panjang, lebar, luas, keliling)
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 16.dp),
                 thickness = 1.dp
@@ -162,6 +193,13 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 text = "Keliling: $keliling",
                 style = MaterialTheme.typography.titleLarge
             )
+            Button(
+                onClick = {shareData(context, message)},
+                modifier = Modifier.padding(top = 8.dp),
+                contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+            ){
+                Text(text = stringResource(id = R.string.bagikan))
+            }
         }
     }
 }
@@ -179,5 +217,15 @@ fun IconPicker(isError: Boolean, unit: String) {
 fun ErrorHint(isError: Boolean) {
     if (isError) {
         Text(text = "Input tidak boleh kosong atau 0")
+    }
+}
+
+private fun shareData(context: Context, message:String){
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, message)
+    }
+    if (shareIntent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(shareIntent)
     }
 }
