@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Mini Project Simple Currency Exchange</string>
+    <string name="bagikan">Share</string>
+    <string name="tentang_aplikasi">About Application</string>
+    <string name="copyright">Currency exchange is an Android application to calculate currency exchanges so one can find out the value of other currencies.</string>
+    <string name="kembali">Back</string>
+
+    <string name="instruksi_teks">Choose conversion type and enter the amount:</string>
+    <string name="label_nominal">Amount</string>
+    <string name="tombol_hitung">Calculate</string>
+    <string name="tombol_reset">Reset</string>
+    <string name="judul_hasil_konversi">Conversion Result</string>
+    <string name="error_input_kosong">Input cannot be empty or 0</string>
+
+    <string name="eur_ke_idr">EUR to IDR</string>
+    <string name="idr_ke_eur">IDR to EUR</string>
+
+    <string name="usd_ke_idr">USD to IDR</string>
+    <string name="idr_ke_usd">IDR to USD</string>
+
+    <string name="idr_ke_mbg">IDR to MBG</string>
+    <string name="mbg_ke_idr">MBG to IDR</string>
+
+    <string name="jpy_ke_idr">JPY to IDR</string>
+    <string name="idr_ke_jpy">IDR to JPY</string>
+
+    <string name="kurs_dollar">United States Dollar</string>
+    <string name="kurs_euro">European Euro</string>
+    <string name="kurs_yen">Japanese yen</string>
+    <string name="kurs_mbg">Makan Siang Gratis</string>
+    <string name="halaman_lainya">Othern Page:</string>
+
+    <string name="template_hasil_konversi">Conversion result for %1$s: %2$s %3$s</string>
+</resources>

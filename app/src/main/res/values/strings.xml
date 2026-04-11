@@ -1,8 +1,35 @@
 <resources>
     <string name="app_name">Mini Project Simple Currency Exchange</string>
     <string name="bagikan">Bagikan</string>
-    <string name="bagikan_template">Panjang: %1$scm\nLebar: %2$scm\nLuas %3$.2scm\nKeliling %4$.2scm</string>
     <string name="tentang_aplikasi">Tentang Aplikasi</string>
-    <string name="copyright">Hitung bangun datar merupakan sebuah aplikasi Android untuk menghitung keliling dan luas bangun datar sehingga seseorang dapat mengetahui keliling dan luas bangun datar.\n\nAplikasi ini dibuat untuk memenuhi tugas mata kuliah Mobpro.\n\nCopyright c 2026 Ariq Hisyam SYahputra.\nAll rights reserved.</string>
+    <string name="copyright">Penukaran mata uang merupakan sebuah aplikasi Android untuk menghitung pertukaran mata uang sehingga seseorang dapat mengetahui nilai mata uang lain.</string>
     <string name="kembali">Kembali</string>
+
+    <string name="instruksi_teks">Pilih jenis konversi dan masukkan nominal:</string>
+    <string name="label_nominal">Nominal</string>
+    <string name="tombol_hitung">Hitung</string>
+    <string name="tombol_reset">Reset</string>
+    <string name="judul_hasil_konversi">Hasil Konversi</string>
+    <string name="error_input_kosong">Input tidak boleh kosong atau 0</string>
+
+    <string name="eur_ke_idr">EUR ke IDR</string>
+    <string name="idr_ke_eur">IDR ke EUR</string>
+
+    <string name="usd_ke_idr">USD ke IDR</string>
+    <string name="idr_ke_usd">IDR ke USD</string>
+
+    <string name="idr_ke_mbg">IDR ke MBG</string>
+    <string name="mbg_ke_idr">MBG ke IDR</string>
+
+    <string name="jpy_ke_idr">JPY ke IDR</string>
+    <string name="idr_ke_jpy">IDR ke JPY</string>
+
+    <string name="kurs_dollar">Dollar Amerika Serikat</string>
+    <string name="kurs_euro">Euro Uni Eropa</string>
+    <string name="kurs_yen">Yen Jepang</string>
+    <string name="kurs_mbg">Makan Siang Gratis</string>
+
+    <string name="halaman_lainya">Halaman Lainnya:</string>
+
+    <string name="template_hasil_konversi">Hasil konversi %1$s: %2$s %3$s</string>
 </resources>
