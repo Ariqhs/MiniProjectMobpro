@@ -210,7 +210,7 @@ fun IconPicker(isError: Boolean, unit: String) {
 @Composable
 fun ErrorHint(isError: Boolean) {
     if (isError) {
-        Text(text = "Input tidak boleh kosong atau 0")
+        Text(text = "Input tidak bisa kosong atau 0")
     }
 }
 
