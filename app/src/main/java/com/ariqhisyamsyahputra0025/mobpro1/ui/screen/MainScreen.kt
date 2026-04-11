@@ -1,44 +1,24 @@
 package com.ariqhisyamsyahputra0025.mobpro1.ui.screen
 
-import android.R.id.message
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +28,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ariqhisyamsyahputra0025.mobpro1.R
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
+import java.text.NumberFormat
+import java.util.Locale
 
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
@@ -64,15 +46,13 @@ fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(text = stringResource(id = R.string.app_name))
-                },
+                title = { Text(text = stringResource(id = R.string.app_name)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 actions = {
-                    IconButton(onClick = {navController.navigate(Screen.About.route)}) {
+                    IconButton(onClick = { navController.navigate(Screen.About.route) }) {
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = stringResource(R.string.tentang_aplikasi),
@@ -86,17 +66,22 @@ fun MainScreen(navController: NavHostController) {
         ScreenContent(Modifier.padding(innerPadding))
     }
 }
+
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
-    var panjang by remember { mutableStateOf("") }
-    var lebar by remember { mutableStateOf("") }
+    var inputAmount by remember { mutableStateOf("") }
+    var resultValue by remember { mutableFloatStateOf(0f) }
+    var inputError by remember { mutableStateOf(false) }
 
-    var luas by remember { mutableFloatStateOf(0f) }
-    var keliling by remember { mutableFloatStateOf(0f) }
+    val radioOptions = listOf("USD ke IDR", "IDR ke USD", "IDR ke MBG")
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
 
-    var panjangError by remember { mutableStateOf(false) }
-    var lebarError by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val exchangeRateUsdToIdr = 16000f
+    val exchangeRateIdrToMbg = 15000f
+
+    val numberFormatter = remember { NumberFormat.getNumberInstance(Locale.forLanguageTag("id-ID")) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -105,32 +90,45 @@ fun ScreenContent(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Mari menghitung luas dan keliling persegi panjang! Masukkan data berikut:",
+            text = "Pilih jenis konversi dan masukkan nominal:",
             style = MaterialTheme.typography.bodyLarge
         )
 
-        OutlinedTextField(
-            value = panjang,
-            onValueChange = { panjang = it },
-            label = { Text(text = "Panjang") },
-            isError = panjangError,
-            trailingIcon = { IconPicker(panjangError, "") },
-            supportingText = { ErrorHint(panjangError) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+        // Radio Button Group
+        Column(Modifier.selectableGroup()) {
+            radioOptions.forEach { text ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .selectable(
+                            selected = (text == selectedOption),
+                            onClick = { onOptionSelected(text) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (text == selectedOption),
+                        onClick = null
+                    )
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+        }
 
         OutlinedTextField(
-            value = lebar,
-            onValueChange = { lebar = it },
-            label = { Text(text = "Lebar") },
-            isError = lebarError,
-            trailingIcon = { IconPicker(lebarError, "") },
-            supportingText = { ErrorHint(lebarError) },
+            value = inputAmount,
+            onValueChange = { inputAmount = it },
+            label = { Text(text = "Nominal") },
+            isError = inputError,
+            trailingIcon = { IconPicker(inputError, selectedOption.split(" ")[0]) },
+            supportingText = { ErrorHint(inputError) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -140,24 +138,22 @@ fun ScreenContent(modifier: Modifier = Modifier) {
         )
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
         ) {
             Button(
                 onClick = {
-                    panjangError = (panjang == "" || panjang == "0")
-                    lebarError = (lebar == "" || lebar == "0")
+                    inputError = (inputAmount.isBlank() || inputAmount == "0")
+                    if (inputError) return@Button
 
-                    if (panjangError || lebarError) return@Button
+                    val amount = inputAmount.toFloatOrNull() ?: 0f
 
-                    val p = panjang.toFloat()
-                    val l = lebar.toFloat()
-
-                    luas = p * l
-                    keliling = 2 * (p + l)
+                    resultValue = when (selectedOption) {
+                        "USD ke IDR" -> amount * exchangeRateUsdToIdr
+                        "IDR ke USD" -> amount / exchangeRateUsdToIdr
+                        "IDR ke MBG" -> amount / exchangeRateIdrToMbg
+                        else -> 0f
+                    }
                 },
                 modifier = Modifier.padding(end = 12.dp),
                 contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
@@ -167,37 +163,35 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 
             OutlinedButton(
                 onClick = {
-                    panjang = ""
-                    lebar = ""
-                    luas = 0f
-                    keliling = 0f
-                    panjangError = false
-                    lebarError = false
+                    inputAmount = ""
+                    resultValue = 0f
+                    inputError = false
                 },
                 contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
             ) {
                 Text(text = "Reset")
             }
         }
-        if (luas != 0f) {
-            val message = stringResource(R.string.bagikan_template, panjang, lebar, luas, keliling)
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 16.dp),
-                thickness = 1.dp
-            )
+
+        if (resultValue != 0f) {
+            val targetCurrency = selectedOption.split(" ").last()
+            val formattedResult = numberFormatter.format(resultValue.toLong())
+            val message = "Hasil konversi $selectedOption: $formattedResult $targetCurrency"
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            Text(text = "Hasil Konversi:", style = MaterialTheme.typography.bodyLarge)
             Text(
-                text = "Luas: $luas",
-                style = MaterialTheme.typography.titleLarge
+                text = "$formattedResult $targetCurrency",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary
             )
-            Text(
-                text = "Keliling: $keliling",
-                style = MaterialTheme.typography.titleLarge
-            )
+
             Button(
-                onClick = {shareData(context, message)},
-                modifier = Modifier.padding(top = 8.dp),
+                onClick = { shareData(context, message) },
+                modifier = Modifier.padding(top = 16.dp),
                 contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
-            ){
+            ) {
                 Text(text = stringResource(id = R.string.bagikan))
             }
         }
@@ -220,12 +214,10 @@ fun ErrorHint(isError: Boolean) {
     }
 }
 
-private fun shareData(context: Context, message:String){
+private fun shareData(context: Context, message: String) {
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, message)
     }
-    if (shareIntent.resolveActivity(context.packageManager) != null) {
-        context.startActivity(shareIntent)
-    }
+    context.startActivity(Intent.createChooser(shareIntent, null))
 }
