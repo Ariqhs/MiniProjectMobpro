@@ -29,6 +29,8 @@
     <string name="kurs_yen">Japanese yen</string>
     <string name="kurs_mbg">Makan Siang Gratis</string>
     <string name="halaman_lainya">Othern Page:</string>
+    <string name="judul_halaman_utama">MONEY EXCHANGE RATE</string>
+    <string name="card_kurs">Today Exchange Rate</string>
 
     <string name="template_hasil_konversi">Conversion result for %1$s: %2$s %3$s</string>
 </resources>

@@ -24,12 +24,15 @@
     <string name="jpy_ke_idr">JPY ke IDR</string>
     <string name="idr_ke_jpy">IDR ke JPY</string>
 
-    <string name="kurs_dollar">Dollar Amerika Serikat</string>
+    <string name="kurs_dollar">Dollar Amerika</string>
     <string name="kurs_euro">Euro Uni Eropa</string>
     <string name="kurs_yen">Yen Jepang</string>
     <string name="kurs_mbg">Makan Siang Gratis</string>
 
     <string name="halaman_lainya">Halaman Lainnya:</string>
+    <string name="judul_halaman_utama">PERTUKARAN NILAI UANG</string>
 
     <string name="template_hasil_konversi">Hasil konversi %1$s: %2$s %3$s</string>
+
+    <string name="card_kurs">Kurs Hari Ini</string>
 </resources>

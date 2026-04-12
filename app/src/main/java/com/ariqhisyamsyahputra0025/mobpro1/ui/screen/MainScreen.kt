@@ -3,19 +3,26 @@ package com.ariqhisyamsyahputra0025.mobpro1.ui.screen
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,8 +32,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -81,8 +97,17 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        Text(
+            text = stringResource(R.string.judul_halaman_utama),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 4.dp, top = 18.dp)
+        )
+        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -90,35 +115,118 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
             OutlinedButton(
                 onClick = { navController.navigate("dollar") },
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                contentPadding = PaddingValues(vertical = 20.dp)
             ) {
-                Text(text = stringResource(R.string.kurs_dollar))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.bg_btn_dollar),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(bottom = 4.dp)
+                            .clip(CircleShape)
+                    )
+                    Text(text = stringResource(R.string.kurs_dollar))
+                }
             }
             OutlinedButton(
                 onClick = { navController.navigate("euro") },
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                contentPadding = PaddingValues(vertical = 20.dp)
             ) {
-                Text(text = stringResource(R.string.kurs_euro))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.bg_btn_euro),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(bottom = 4.dp)
+                            .clip(CircleShape)
+                    )
+                    Text(text = stringResource(R.string.kurs_euro))
+                }
             }
         }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             OutlinedButton(
                 onClick = { navController.navigate("japaneseYen") },
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .height(160.dp),
+                contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                Text(text = stringResource(R.string.kurs_yen))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.bg_btn_yen),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(bottom = 4.dp)
+                            .clip(CircleShape)
+                    )
+                    Text(text = stringResource(R.string.kurs_yen))
+                }
             }
             OutlinedButton(
                 onClick = { navController.navigate("mbg") },
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .height(160.dp),
+                contentPadding = PaddingValues(vertical = 20.dp)
             ) {
-                Text(text = stringResource(id = R.string.kurs_mbg))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter =  painterResource(id = R.drawable.bg_btn_omprengmbbg),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(bottom = 4.dp)
+                            .clip(CircleShape)
+                    )
+                    Text(text = stringResource(id = R.string.kurs_mbg))
+                }
+            }
+        }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            val gradientColors = listOf(Red, Blue)
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.card_kurs),
+                    style = TextStyle(
+                        brush = Brush.linearGradient(
+                            colors = gradientColors
+                        )
+                    )
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                Text(text = "\uD83C\uDDFA\uD83C\uDDF8 1 USD = Rp 16.000        \uD83C\uDDEA\uD83C\uDDFA 1 EUR = Rp 17.500", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "\uD83C\uDDEF\uD83C\uDDF5 1 JPY = Rp 105              \uD83C\uDF72 1 MBG = Rp 15.000", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
