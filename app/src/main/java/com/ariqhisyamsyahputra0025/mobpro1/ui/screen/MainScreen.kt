@@ -53,10 +53,13 @@ import com.ariqhisyamsyahputra0025.mobpro1.R
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
 
-// 1. Data Class untuk menyimpan struktur menu
+// 1. Data Class diperbarui dengan variabel data tambahan (Modul 8)
 data class MenuMataUang(
-    val idRoute: String,
-    val idStringNama: Int, // Menggunakan Int agar bisa memanggil stringResource
+    val namaMataUang: String,
+    val kurs: Float,
+    val simbolAsal: String,
+    val simbolTujuan: String,
+    val idStringNama: Int,
     val ikonRes: Int
 )
 
@@ -101,23 +104,21 @@ fun MainScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostController) {
-    // 2. Daftar menu dimasukkan ke dalam List
+    // 2. Daftar Menu diperbarui dengan data kurs dan simbol (Modul 8)
     val daftarMenu = listOf(
-        MenuMataUang("dollar", R.string.kurs_dollar, R.drawable.bg_btn_dollar),
-        MenuMataUang("euro", R.string.kurs_euro, R.drawable.bg_btn_euro),
-        MenuMataUang("japaneseYen", R.string.kurs_yen, R.drawable.bg_btn_yen),
-        MenuMataUang("mbg", R.string.kurs_mbg, R.drawable.bg_btn_omprengmbbg)
+        MenuMataUang("Dollar", 16000f, "USD", "IDR", R.string.kurs_dollar, R.drawable.bg_btn_dollar),
+        MenuMataUang("Euro", 17500f, "EUR", "IDR", R.string.kurs_euro, R.drawable.bg_btn_euro),
+        MenuMataUang("Yen", 105f, "JPY", "IDR", R.string.kurs_yen, R.drawable.bg_btn_yen),
+        MenuMataUang("MBG", 15000f, "MBG", "IDR", R.string.kurs_mbg, R.drawable.bg_btn_omprengmbbg)
     )
 
-    // 3. Menggunakan LazyVerticalGrid pengganti Column vertikal biasa
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2), // Menetapkan 2 kolom
+        columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier.fillMaxSize()
     ) {
-        // Bagian Header / Judul (Memakan 2 kolom penuh)
         item(span = { GridItemSpan(2) }) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
@@ -131,15 +132,16 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
             }
         }
 
-        // Bagian Tombol Menu (Di-generate otomatis dari List)
+        // 3. onClick diperbarui untuk mengirim argumen navigasi (Modul 8)
         items(daftarMenu) { menu ->
             TombolMenuMataUang(
                 menu = menu,
-                onClick = { navController.navigate(menu.idRoute) }
+                onClick = {
+                    navController.navigate("calculator/${menu.namaMataUang}/${menu.kurs}/${menu.simbolAsal}/${menu.simbolTujuan}")
+                }
             )
         }
 
-        // Bagian Footer / Kartu (Memakan 2 kolom penuh)
         item(span = { GridItemSpan(2) }) {
             Column {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -173,7 +175,6 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
     }
 }
 
-// 4. Komponen cetakan untuk satu tombol
 @Composable
 fun TombolMenuMataUang(menu: MenuMataUang, onClick: () -> Unit) {
     OutlinedButton(
@@ -188,7 +189,7 @@ fun TombolMenuMataUang(menu: MenuMataUang, onClick: () -> Unit) {
             Image(
                 painter = painterResource(id = menu.ikonRes),
                 contentDescription = stringResource(id = menu.idStringNama),
-                contentScale = ContentScale.Crop, // Tambahan agar gambar bulat sempurna
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(90.dp)
                     .padding(bottom = 8.dp)
