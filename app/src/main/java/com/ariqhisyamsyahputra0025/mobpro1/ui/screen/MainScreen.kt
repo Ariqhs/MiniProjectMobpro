@@ -7,15 +7,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
@@ -38,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -50,6 +52,13 @@ import androidx.navigation.compose.rememberNavController
 import com.ariqhisyamsyahputra0025.mobpro1.R
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
+
+// 1. Data Class untuk menyimpan struktur menu
+data class MenuMataUang(
+    val idRoute: String,
+    val idStringNama: Int, // Menggunakan Int agar bisa memanggil stringResource
+    val ikonRes: Int
+)
 
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
@@ -92,142 +101,103 @@ fun MainScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostController) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    // 2. Daftar menu dimasukkan ke dalam List
+    val daftarMenu = listOf(
+        MenuMataUang("dollar", R.string.kurs_dollar, R.drawable.bg_btn_dollar),
+        MenuMataUang("euro", R.string.kurs_euro, R.drawable.bg_btn_euro),
+        MenuMataUang("japaneseYen", R.string.kurs_yen, R.drawable.bg_btn_yen),
+        MenuMataUang("mbg", R.string.kurs_mbg, R.drawable.bg_btn_omprengmbbg)
+    )
+
+    // 3. Menggunakan LazyVerticalGrid pengganti Column vertikal biasa
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2), // Menetapkan 2 kolom
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier.fillMaxSize()
     ) {
-        Text(
-            text = stringResource(R.string.judul_halaman_utama),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 4.dp, top = 18.dp)
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedButton(
-                onClick = { navController.navigate("dollar") },
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 20.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.bg_btn_dollar),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .padding(bottom = 4.dp)
-                            .clip(CircleShape)
-                    )
-                    Text(text = stringResource(R.string.kurs_dollar))
-                }
-            }
-            OutlinedButton(
-                onClick = { navController.navigate("euro") },
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 20.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.bg_btn_euro),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .padding(bottom = 4.dp)
-                            .clip(CircleShape)
-                    )
-                    Text(text = stringResource(R.string.kurs_euro))
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            OutlinedButton(
-                onClick = { navController.navigate("japaneseYen") },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(160.dp),
-                contentPadding = PaddingValues(vertical = 8.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.bg_btn_yen),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .padding(bottom = 4.dp)
-                            .clip(CircleShape)
-                    )
-                    Text(text = stringResource(R.string.kurs_yen))
-                }
-            }
-            OutlinedButton(
-                onClick = { navController.navigate("mbg") },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(160.dp),
-                contentPadding = PaddingValues(vertical = 20.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter =  painterResource(id = R.drawable.bg_btn_omprengmbbg),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .padding(bottom = 4.dp)
-                            .clip(CircleShape)
-                    )
-                    Text(text = stringResource(id = R.string.kurs_mbg))
-                }
-            }
-        }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            val gradientColors = listOf(Red, Blue)
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+        // Bagian Header / Judul (Memakan 2 kolom penuh)
+        item(span = { GridItemSpan(2) }) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = stringResource(R.string.card_kurs),
-                    style = TextStyle(
-                        brush = Brush.linearGradient(
-                            colors = gradientColors
-                        )
-                    )
+                    text = stringResource(R.string.judul_halaman_utama),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 4.dp, top = 18.dp)
                 )
-                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = "\uD83C\uDDFA\uD83C\uDDF8 1 USD = Rp 16.000        \uD83C\uDDEA\uD83C\uDDFA 1 EUR = Rp 17.500", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "\uD83C\uDDEF\uD83C\uDDF5 1 JPY = Rp 105              \uD83C\uDF72 1 MBG = Rp 15.000", style = MaterialTheme.typography.bodyMedium)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
+        }
+
+        // Bagian Tombol Menu (Di-generate otomatis dari List)
+        items(daftarMenu) { menu ->
+            TombolMenuMataUang(
+                menu = menu,
+                onClick = { navController.navigate(menu.idRoute) }
+            )
+        }
+
+        // Bagian Footer / Kartu (Memakan 2 kolom penuh)
+        item(span = { GridItemSpan(2) }) {
+            Column {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    val gradientColors = listOf(Red, Blue)
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.card_kurs),
+                            style = TextStyle(
+                                brush = Brush.linearGradient(
+                                    colors = gradientColors
+                                )
+                            )
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                        Text(text = "\uD83C\uDDFA\uD83C\uDDF8 1 USD = Rp 16.000        \uD83C\uDDEA\uD83C\uDDFA 1 EUR = Rp 17.500", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "\uD83C\uDDEF\uD83C\uDDF5 1 JPY = Rp 105              \uD83C\uDF72 1 MBG = Rp 15.000", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 4. Komponen cetakan untuk satu tombol
+@Composable
+fun TombolMenuMataUang(menu: MenuMataUang, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.height(160.dp),
+        contentPadding = PaddingValues(vertical = 12.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = menu.ikonRes),
+                contentDescription = stringResource(id = menu.idStringNama),
+                contentScale = ContentScale.Crop, // Tambahan agar gambar bulat sempurna
+                modifier = Modifier
+                    .size(90.dp)
+                    .padding(bottom = 8.dp)
+                    .clip(CircleShape)
+            )
+            Text(
+                text = stringResource(id = menu.idStringNama),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
