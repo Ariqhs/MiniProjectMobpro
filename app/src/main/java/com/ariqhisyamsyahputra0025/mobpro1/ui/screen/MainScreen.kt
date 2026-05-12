@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,8 +19,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,16 +33,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -50,10 +62,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ariqhisyamsyahputra0025.mobpro1.R
+import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatDatabase
+import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatKonversi
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
+import kotlinx.coroutines.launch
 
-// 1. Data Class diperbarui dengan variabel data tambahan (Modul 8)
 data class MenuMataUang(
     val namaMataUang: String,
     val kurs: Float,
@@ -104,7 +118,14 @@ fun MainScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostController) {
-    // 2. Daftar Menu diperbarui dengan data kurs dan simbol (Modul 8)
+    val context = LocalContext.current
+    val database = RiwayatDatabase.getDatabase(context)
+    val dao = database.riwayatDao()
+
+    val daftarRiwayat by dao.getAllRiwayat().collectAsState(initial = emptyList())
+    var riwayatYangMauDihapus by remember { mutableStateOf<RiwayatKonversi?>(null) }
+    val scope = rememberCoroutineScope()
+
     val daftarMenu = listOf(
         MenuMataUang("Dollar", 16000f, "USD", "IDR", R.string.kurs_dollar, R.drawable.bg_btn_dollar),
         MenuMataUang("Euro", 17500f, "EUR", "IDR", R.string.kurs_euro, R.drawable.bg_btn_euro),
@@ -132,7 +153,6 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
             }
         }
 
-        // 3. onClick diperbarui untuk mengirim argumen navigasi (Modul 8)
         items(daftarMenu) { menu ->
             TombolMenuMataUang(
                 menu = menu,
@@ -172,6 +192,85 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
                 }
             }
         }
+        item(span = { GridItemSpan(2) }) {
+            Column(modifier = Modifier.padding(top = 24.dp)) {
+                Text(
+                    text = "Riwayat Konversi Terakhir",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+
+                if (daftarRiwayat.isEmpty()) {
+                    Text(
+                        text = "Belum ada riwayat konversi.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
+            }
+        }
+        items(daftarRiwayat, span = { GridItemSpan(2) }) { riwayat ->
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween // Menjauhkan teks dan tombol
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = riwayat.tipeKonversi, style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            text = "${riwayat.nominal} -> ${riwayat.hasil}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    IconButton(
+                        onClick = { riwayatYangMauDihapus = riwayat }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Hapus Riwayat Ini",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    if (riwayatYangMauDihapus != null) {
+        AlertDialog(
+            onDismissRequest = { riwayatYangMauDihapus = null },
+            title = {
+                Text(text = "Hapus Data")
+            },
+            text = {
+                Text(text = "Apakah Anda yakin ingin menghapus data konversi ${riwayatYangMauDihapus?.nominal} ke ${riwayatYangMauDihapus?.tipeKonversi}?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            dao.deleteRiwayat(riwayatYangMauDihapus!!)
+                            riwayatYangMauDihapus = null
+                        }
+                    }
+                ) {
+                    Text("Hapus", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { riwayatYangMauDihapus = null }
+                ) {
+                    Text("Batal")
+                }
+            }
+        )
     }
 }
 

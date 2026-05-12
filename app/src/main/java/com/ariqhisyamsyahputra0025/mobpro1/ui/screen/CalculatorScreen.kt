@@ -1,6 +1,5 @@
 package com.ariqhisyamsyahputra0025.mobpro1.ui.screen
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,30 +45,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.ariqhisyamsyahputra0025.mobpro1.R
+import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatDatabase
+import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatKonversi
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
-import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun CalculatorScreenPreview() {
-    Mobpro1Theme {
-        CalculatorScreen(
-            navController = rememberNavController(),
-            namaMataUang = "Dollar",
-            kurs = 16000f,
-            simbolAsal = "USD",
-            simbolTujuan = "IDR"
-        )
-    }
-}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreen(
@@ -127,6 +113,11 @@ fun CalculatorContent(
     simbolAsal: String,
     simbolTujuan: String
 ) {
+    // 1. Siapkan CoroutineScope dan DAO untuk menyimpan data ke database
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val dao = RiwayatDatabase.getDatabase(context).riwayatDao()
+
     var inputAmount by rememberSaveable { mutableStateOf("") }
     var resultValue by rememberSaveable { mutableFloatStateOf(0f) }
     var inputError by rememberSaveable { mutableStateOf(false) }
@@ -135,10 +126,7 @@ fun CalculatorContent(
     val optTujuanKeAsal = "$simbolTujuan ke $simbolAsal"
 
     val radioOptions = listOf(optAsalKeTujuan, optTujuanKeAsal)
-
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
-
-    val context = LocalContext.current
 
     val numberFormatter = remember { NumberFormat.getNumberInstance(Locale.forLanguageTag("id-ID")) }
 
@@ -214,11 +202,21 @@ fun CalculatorContent(
 
                     val amount = inputAmount.toFloatOrNull() ?: 0f
 
-                    // Perhitungan dinamis menggunakan parameter `kurs`
                     resultValue = when (selectedOption) {
                         optAsalKeTujuan -> amount * kurs
                         optTujuanKeAsal -> amount / kurs
                         else -> 0f
+                    }
+
+                    // 2. Simpan hasil perhitungan ke Database
+                    scope.launch {
+                        val riwayatBaru = RiwayatKonversi(
+                            mataUang = namaMataUang,
+                            nominal = amount,
+                            hasil = resultValue,
+                            tipeKonversi = selectedOption
+                        )
+                        dao.insertRiwayat(riwayatBaru)
                     }
                 },
                 modifier = Modifier.padding(end = 12.dp),
@@ -239,39 +237,41 @@ fun CalculatorContent(
             }
         }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+        if (resultValue != 0f) {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-        val targetCurrency = selectedOption.split(" ").last()
-        val formattedResult = numberFormatter.format(resultValue.toLong())
+            val targetCurrency = selectedOption.split(" ").last()
+            val formattedResult = numberFormatter.format(resultValue.toLong())
 
-        val message = stringResource(
-            id = R.string.template_hasil_konversi,
-            selectedOption,
-            formattedResult,
-            targetCurrency
-        )
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(text = stringResource(id = R.string.judul_hasil_konversi), style = MaterialTheme.typography.bodyLarge)
-            Text(
-                text = "$formattedResult $targetCurrency",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary
+            val message = stringResource(
+                id = R.string.template_hasil_konversi,
+                selectedOption,
+                formattedResult,
+                targetCurrency
             )
-            Button(
-                onClick = { shareData(context, message) },
-                modifier = Modifier.padding(top = 1.dp),
-                contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
-            ) {
-                Text(text = stringResource(id = R.string.bagikan))
-            }
-        }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = stringResource(id = R.string.judul_hasil_konversi), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = "$formattedResult $targetCurrency",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Button(
+                    onClick = { shareData(context, message) },
+                    modifier = Modifier.padding(top = 1.dp),
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.bagikan))
+                }
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+        }
 
         OutlinedButton(
             onClick = { navController.navigate(Screen.Home.route) },
