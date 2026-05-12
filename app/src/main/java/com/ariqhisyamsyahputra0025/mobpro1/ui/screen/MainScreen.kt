@@ -19,10 +19,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DarkMode // Import Ikon DataStore
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LightMode // Import Ikon DataStore
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
@@ -65,10 +67,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ariqhisyamsyahputra0025.mobpro1.R
+import com.ariqhisyamsyahputra0025.mobpro1.pref.SettingPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatDatabase
 import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatKonversi
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
-import com.ariqhisyamsyahputra0025.mobpro1.SettingPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
 import kotlinx.coroutines.launch
 
@@ -93,7 +95,6 @@ fun MainScreenPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
-    // Membaca DataStore untuk UI Toggle
     val context = LocalContext.current
     val pref = SettingPreferences(context)
     val isDarkMode by pref.getThemeSetting.collectAsState(initial = false)
@@ -148,6 +149,9 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
     val daftarRiwayat by dao.getAllRiwayat().collectAsState(initial = emptyList())
     var riwayatYangMauDihapus by remember { mutableStateOf<RiwayatKonversi?>(null) }
     val scope = rememberCoroutineScope()
+
+    val pref = SettingPreferences(context)
+    val isGridLayout by pref.getLayoutSetting.collectAsState(initial = false)
 
     val daftarMenu = listOf(
         MenuMataUang("Dollar", 16000f, "USD", "IDR", R.string.kurs_dollar, R.drawable.bg_btn_dollar),
@@ -215,13 +219,35 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
                 }
             }
         }
+
         item(span = { GridItemSpan(2) }) {
             Column(modifier = Modifier.padding(top = 24.dp)) {
-                Text(
-                    text = "Riwayat Konversi Terakhir",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Riwayat Konversi Terakhir",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (daftarRiwayat.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    pref.saveLayoutSetting(!isGridLayout)
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isGridLayout) Icons.AutoMirrored.Filled.List else Icons.Filled.GridView,
+                                contentDescription = "Ganti Tampilan",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
                 HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
 
                 if (daftarRiwayat.isEmpty()) {
@@ -234,50 +260,68 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
                 }
             }
         }
-        items(daftarRiwayat, span = { GridItemSpan(2) }) { riwayat ->
+
+        items(
+            items = daftarRiwayat,
+            key = { riwayat -> riwayat.id },
+            span = { GridItemSpan(if (isGridLayout) 1 else maxLineSpan) }
+        ) { riwayat ->
             Card(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                if (isGridLayout) {
+                    Column(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(text = riwayat.tipeKonversi, style = MaterialTheme.typography.labelLarge)
                         Text(
                             text = "${riwayat.nominal} -> ${riwayat.hasil}",
                             style = MaterialTheme.typography.bodyMedium
                         )
-                    }
-
-                    Row {
-                        IconButton(
-                            onClick = {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            IconButton(onClick = {
                                 val menu = daftarMenu.find { it.namaMataUang == riwayat.mataUang }
                                 val kurs = menu?.kurs ?: 0f
                                 val simbolAsal = menu?.simbolAsal ?: ""
                                 val simbolTujuan = menu?.simbolTujuan ?: ""
-
                                 navController.navigate("edit/${riwayat.id}/${riwayat.mataUang}/${riwayat.nominal}/${kurs}/${simbolAsal}/${simbolTujuan}/${riwayat.tipeKonversi}")
+                            }) {
+                                Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = "Edit Riwayat Ini",
-                                tint = MaterialTheme.colorScheme.primary
+                            IconButton(onClick = { riwayatYangMauDihapus = riwayat }) {
+                                Icon(imageVector = Icons.Filled.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = riwayat.tipeKonversi, style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                text = "${riwayat.nominal} -> ${riwayat.hasil}",
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
 
-                        IconButton(
-                            onClick = { riwayatYangMauDihapus = riwayat }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Hapus Riwayat Ini",
-                                tint = MaterialTheme.colorScheme.error
-                            )
+                        Row {
+                            IconButton(onClick = {
+                                val menu = daftarMenu.find { it.namaMataUang == riwayat.mataUang }
+                                val kurs = menu?.kurs ?: 0f
+                                val simbolAsal = menu?.simbolAsal ?: ""
+                                val simbolTujuan = menu?.simbolTujuan ?: ""
+                                navController.navigate("edit/${riwayat.id}/${riwayat.mataUang}/${riwayat.nominal}/${kurs}/${simbolAsal}/${simbolTujuan}/${riwayat.tipeKonversi}")
+                            }) {
+                                Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                            }
+                            IconButton(onClick = { riwayatYangMauDihapus = riwayat }) {
+                                Icon(imageVector = Icons.Filled.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
+                            }
                         }
                     }
                 }

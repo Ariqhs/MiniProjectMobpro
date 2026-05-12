@@ -1,4 +1,4 @@
-package com.ariqhisyamsyahputra0025.mobpro1
+package com.ariqhisyamsyahputra0025.mobpro1.pref
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -12,13 +12,28 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "pengaturan_aplikasi")
 
 class SettingPreferences(private val context: Context) {
+
     private val TEMA_KEY = booleanPreferencesKey("tema_gelap_aktif")
+
+    private val LAYOUT_KEY = booleanPreferencesKey("layout_grid_aktif")
+
     val getThemeSetting: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[TEMA_KEY] ?: false
     }
+
     suspend fun saveThemeSetting(isDarkModeActive: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[TEMA_KEY] = isDarkModeActive
+        }
+    }
+
+    val getLayoutSetting: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[LAYOUT_KEY] ?: false
+    }
+
+    suspend fun saveLayoutSetting(isGridActive: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[LAYOUT_KEY] = isGridActive
         }
     }
 }
