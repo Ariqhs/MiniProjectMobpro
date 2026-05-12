@@ -19,8 +19,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode // Import Ikon DataStore
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit // Tambahan Import
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LightMode // Import Ikon DataStore
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
@@ -66,6 +68,7 @@ import com.ariqhisyamsyahputra0025.mobpro1.R
 import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatDatabase
 import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatKonversi
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
+import com.ariqhisyamsyahputra0025.mobpro1.SettingPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
 import kotlinx.coroutines.launch
 
@@ -90,6 +93,12 @@ fun MainScreenPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
+    // Membaca DataStore untuk UI Toggle
+    val context = LocalContext.current
+    val pref = SettingPreferences(context)
+    val isDarkMode by pref.getThemeSetting.collectAsState(initial = false)
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -99,6 +108,19 @@ fun MainScreen(navController: NavHostController) {
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 actions = {
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                pref.saveThemeSetting(!isDarkMode)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isDarkMode) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                            contentDescription = "Ganti Tema",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = { navController.navigate(Screen.About.route) }) {
                         Icon(
                             imageVector = Icons.Outlined.Info,
