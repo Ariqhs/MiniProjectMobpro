@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit // Tambahan Import
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
@@ -219,7 +220,7 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
                 Row(
                     modifier = Modifier.padding(16.dp).fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween // Menjauhkan teks dan tombol
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = riwayat.tipeKonversi, style = MaterialTheme.typography.labelLarge)
@@ -228,14 +229,34 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
-                    IconButton(
-                        onClick = { riwayatYangMauDihapus = riwayat }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Hapus Riwayat Ini",
-                            tint = MaterialTheme.colorScheme.error
-                        )
+
+                    Row {
+                        IconButton(
+                            onClick = {
+                                val menu = daftarMenu.find { it.namaMataUang == riwayat.mataUang }
+                                val kurs = menu?.kurs ?: 0f
+                                val simbolAsal = menu?.simbolAsal ?: ""
+                                val simbolTujuan = menu?.simbolTujuan ?: ""
+
+                                navController.navigate("edit/${riwayat.id}/${riwayat.mataUang}/${riwayat.nominal}/${kurs}/${simbolAsal}/${simbolTujuan}/${riwayat.tipeKonversi}")
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = "Edit Riwayat Ini",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { riwayatYangMauDihapus = riwayat }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Hapus Riwayat Ini",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             }

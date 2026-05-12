@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.AboutScreen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.CalculatorScreen
+import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.EditScreen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.MainScreen
 
 @Composable
@@ -20,6 +21,7 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         composable(route = Screen.Home.route) {
             MainScreen(navController)
         }
+
         composable(route = Screen.About.route) {
             AboutScreen(navController)
         }
@@ -44,6 +46,38 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
                 kurs = kurs,
                 simbolAsal = simbolAsal,
                 simbolTujuan = simbolTujuan
+            )
+        }
+
+        composable(
+            route = "edit/{id}/{nama}/{nominal}/{kurs}/{simbolAsal}/{simbolTujuan}/{tipe}",
+            arguments = listOf(
+                navArgument("id") { type = NavType.IntType },
+                navArgument("nama") { type = NavType.StringType },
+                navArgument("nominal") { type = NavType.FloatType },
+                navArgument("kurs") { type = NavType.FloatType },
+                navArgument("simbolAsal") { type = NavType.StringType },
+                navArgument("simbolTujuan") { type = NavType.StringType },
+                navArgument("tipe") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            val nama = backStackEntry.arguments?.getString("nama") ?: ""
+            val nominal = backStackEntry.arguments?.getFloat("nominal") ?: 0f
+            val kurs = backStackEntry.arguments?.getFloat("kurs") ?: 0f
+            val simbolAsal = backStackEntry.arguments?.getString("simbolAsal") ?: ""
+            val simbolTujuan = backStackEntry.arguments?.getString("simbolTujuan") ?: ""
+            val tipe = backStackEntry.arguments?.getString("tipe") ?: ""
+
+            EditScreen(
+                navController = navController,
+                id = id,
+                nama = nama,
+                nominalLama = nominal,
+                kurs = kurs,
+                simbolAsal = simbolAsal,
+                simbolTujuan = simbolTujuan,
+                tipeLama = tipe
             )
         }
     }
