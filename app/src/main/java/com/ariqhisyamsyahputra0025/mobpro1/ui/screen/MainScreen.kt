@@ -182,7 +182,6 @@ fun MainScreen(
             )
         }
 
-        // Profil Dialog
         if (showProfilDialog) {
             ProfilDialog(
                 user = user,
