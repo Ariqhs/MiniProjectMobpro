@@ -33,4 +33,12 @@
     <string name="card_kurs">Today Exchange Rate</string>
 
     <string name="template_hasil_konversi">Conversion result for %1$s: %2$s %3$s</string>
+    <string name="try_again">try again</string>
+    <string name="profil">Profile</string>
+    <string name="tutup">Close</string>
+    <string name="logout">Logout</string>
+    <string name="tambah_hewan">Add Data</string>
+    <string name="nama">Item name/Title</string>
+    <string name="batal">Cancel</string>
+    <string name="simpan">Save</string>
 </resources>
