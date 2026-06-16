@@ -78,7 +78,6 @@ data class MenuMataUang(
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    userEmail: String = "",
     viewModel: MainViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -86,12 +85,10 @@ fun MainScreen(
     val isDarkMode by pref.getThemeSetting.collectAsState(initial = false)
     val scope = rememberCoroutineScope()
 
-    // Google Sign-In DataStore
     val dataStore = remember { UserDataStore(context) }
     val user by dataStore.userFlow.collectAsState(initial = User())
     var showProfilDialog by remember { mutableStateOf(false) }
 
-    // Camera and Dialog States
     var showAddDialog by remember { mutableStateOf(false) }
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
 
@@ -129,7 +126,6 @@ fun MainScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    // Profile Icon for Login / Show Dialog
                     IconButton(onClick = {
                         if (user.email.isEmpty()) {
                             scope.launch(Dispatchers.IO) { signIn(context, dataStore) }

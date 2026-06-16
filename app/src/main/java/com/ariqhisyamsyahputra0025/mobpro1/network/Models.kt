@@ -10,6 +10,5 @@ data class DiaryEntry(
     @SerializedName("currency_code") val currencyCode: String,
     @SerializedName("converted_idr") val convertedIdr: Double,
     @SerializedName("image_path") val imagePath: String,
-    // We add this to hold the full URL from Laravel
     @SerializedName("image_url") val imageUrl: String? = null
 )

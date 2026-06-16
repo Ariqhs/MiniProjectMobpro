@@ -113,7 +113,6 @@ fun CalculatorContent(
     simbolAsal: String,
     simbolTujuan: String
 ) {
-    // 1. Siapkan CoroutineScope dan DAO untuk menyimpan data ke database
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dao = RiwayatDatabase.getDatabase(context).riwayatDao()
@@ -208,7 +207,6 @@ fun CalculatorContent(
                         else -> 0f
                     }
 
-                    // 2. Simpan hasil perhitungan ke Database
                     scope.launch {
                         val riwayatBaru = RiwayatKonversi(
                             mataUang = namaMataUang,
