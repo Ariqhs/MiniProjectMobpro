@@ -1,40 +1,25 @@
 package com.ariqhisyamsyahputra0025.mobpro1.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.ariqhisyamsyahputra0025.mobpro1.data.UserPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.AboutScreen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.CalculatorScreen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.EditScreen
 import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.MainScreen
-import com.ariqhisyamsyahputra0025.mobpro1.ui.screen.LoginScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
-    val context = LocalContext.current
-    val userPreferences = UserPreferences(context)
-    val userEmail by userPreferences.userEmail.collectAsState(initial = null)
-
-    val startDest = if (userEmail.isNullOrBlank()) "login" else Screen.Home.route
-
     NavHost(
         navController = navController,
-        startDestination = startDest
+        startDestination = Screen.Home.route
     ) {
-        composable("login") {
-            LoginScreen(navController)
-        }
-
         composable(route = Screen.Home.route) {
-            MainScreen(navController = navController, userEmail = userEmail ?: "")
+            MainScreen(navController = navController)
         }
 
         composable(route = Screen.About.route) {
