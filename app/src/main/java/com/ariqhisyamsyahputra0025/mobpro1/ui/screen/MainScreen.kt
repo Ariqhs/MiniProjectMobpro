@@ -211,7 +211,7 @@ fun MainScreen(
                 onSave = { title, amount, currency ->
                     viewModel.addEntry(user.email, title, amount, currency, bitmap!!)
                     showAddDialog = false
-                    Toast.makeText(context, "Menyimpan ke server...", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Menyimpan", Toast.LENGTH_SHORT).show()
                 }
             )
         }

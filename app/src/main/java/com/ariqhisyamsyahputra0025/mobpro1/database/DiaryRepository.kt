@@ -47,6 +47,10 @@ class DiaryRepository(
         }
     }
 
+    suspend fun deleteLocalDiary(id: String) {
+        diaryDao.deleteById(id)
+    }
+
     private suspend fun downloadAndCacheImage(url: String, id: String): String? =
         withContext(Dispatchers.IO) {
             try {
@@ -58,10 +62,31 @@ class DiaryRepository(
                     return@withContext file.absolutePath
                 }
 
-                val connection = URL(url).openConnection() as HttpURLConnection
-                connection.connectTimeout = 15000
-                connection.readTimeout = 15000
-                connection.connect()
+                var currentUrl = url
+                var connection: HttpURLConnection
+                var redirectCount = 0
+
+                while (true) {
+                    connection = URL(currentUrl).openConnection() as HttpURLConnection
+                    connection.connectTimeout = 15000
+                    connection.readTimeout = 15000
+                    connection.instanceFollowRedirects = false
+                    connection.connect()
+
+                    val code = connection.responseCode
+                    if (code in 300..399) {
+                        val location = connection.getHeaderField("Location")
+                        connection.disconnect()
+                        if (location.isNullOrEmpty() || redirectCount >= 5) {
+                            Log.e("Repository", "Gagal download image: redirect loop/no location")
+                            return@withContext null
+                        }
+                        currentUrl = location
+                        redirectCount++
+                        continue
+                    }
+                    break
+                }
 
                 if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                     connection.inputStream.use { input ->
@@ -79,9 +104,4 @@ class DiaryRepository(
                 null
             }
         }
-
-    fun deleteLocalImage(id: String) {
-        val file = File(File(appContext.filesDir, "diary_images"), "$id.jpg")
-        if (file.exists()) file.delete()
-    }
 }

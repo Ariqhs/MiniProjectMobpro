@@ -16,4 +16,7 @@ interface DiaryDao {
 
     @Query("DELETE FROM tabel_diary")
     suspend fun clearAll()
+
+    @Query("DELETE FROM tabel_diary WHERE id = :id")
+    suspend fun deleteById(id: String)
 }
