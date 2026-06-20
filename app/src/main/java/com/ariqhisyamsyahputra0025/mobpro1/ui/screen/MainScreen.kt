@@ -53,7 +53,7 @@ import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
 import com.ariqhisyamsyahputra0025.mobpro1.network.ApiState
 import com.ariqhisyamsyahputra0025.mobpro1.network.DiaryEntry
 import com.ariqhisyamsyahputra0025.mobpro1.network.UserDataStore
-import com.ariqhisyamsyahputra0025.mobpro1.pref.SettingPreferences
+import com.ariqhisyamsyahputra0025.mobpro1.SettingPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.ui.MainViewModel
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions

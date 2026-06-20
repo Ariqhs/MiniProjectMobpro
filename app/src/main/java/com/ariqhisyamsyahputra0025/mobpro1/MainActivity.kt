@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.SetupNavGraph
-import com.ariqhisyamsyahputra0025.mobpro1.pref.SettingPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.ui.theme.Mobpro1Theme
 
 class MainActivity : ComponentActivity() {
