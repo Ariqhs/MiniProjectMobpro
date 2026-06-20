@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
-private const val BASE_URL = "http://192.168.31.38:8000/api/"
+private const val BASE_URL = "https://miniprojectmobpro-production-e5b0.up.railway.app/api/"
 
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())

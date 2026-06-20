@@ -297,7 +297,7 @@ fun ScreenContent(
                         if (diaries.isEmpty()) {
                             item(span = { GridItemSpan(2) }) {
                                 Text(
-                                    text = "Belum ada diary tersimpan di server.",
+                                    text = "Belum ada diary tersimpan.",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Color.Gray,
                                     modifier = Modifier.padding(vertical = 16.dp)
@@ -350,7 +350,7 @@ fun ScreenContent(
         AlertDialog(
             onDismissRequest = { itemToDelete = null },
             title = { Text("Hapus Data") },
-            text = { Text("Apakah Anda yakin ingin menghapus '${itemToDelete?.title}' dari server?") },
+            text = { Text("Apakah Anda yakin ingin menghapus '${itemToDelete?.title}' ?") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteEntry(userEmail, itemToDelete!!.id)
@@ -366,6 +366,7 @@ fun ScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddDiaryDialog(
     bitmap: Bitmap,
@@ -374,7 +375,11 @@ fun AddDiaryDialog(
 ) {
     var title by remember { mutableStateOf("") }
     var amountText by remember { mutableStateOf("") }
-    var currency by remember { mutableStateOf("") }
+
+    // Persiapan data untuk dropdown
+    val currencyOptions = listOf("USD", "EUR", "JPY", "MBG", "IDR")
+    var currency by remember { mutableStateOf(currencyOptions[0]) } // Set nilai default ke USD
+    var expanded by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -384,28 +389,62 @@ fun AddDiaryDialog(
                 Image(
                     bitmap = bitmap.asImageBitmap(),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(8.dp)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Nama Barang/Pengalaman") },
-                    singleLine = true
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = currency,
-                    onValueChange = { currency = it.uppercase() },
-                    label = { Text("Mata Uang (Contoh: USD)") },
-                    singleLine = true
-                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = currency,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Mata Uang") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        currencyOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    currency = option
+                                    expanded = false // Tutup menu setelah dipilih
+                                }
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = amountText,
                     onValueChange = { amountText = it },
                     label = { Text("Harga/Nominal") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         },
@@ -417,7 +456,7 @@ fun AddDiaryDialog(
                 },
                 enabled = title.isNotBlank() && currency.isNotBlank() && amountText.isNotBlank()
             ) {
-                Text("Simpan ke Server")
+                Text(stringResource(R.string.simpan))
             }
         },
         dismissButton = {
