@@ -61,20 +61,18 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
                 navArgument("tipe") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            backStackEntry.arguments?.getInt("id") ?: 0
             val nama = backStackEntry.arguments?.getString("nama") ?: ""
             val nominal = backStackEntry.arguments?.getFloat("nominal") ?: 0f
-            val kurs = backStackEntry.arguments?.getFloat("kurs") ?: 0f
+            backStackEntry.arguments?.getFloat("kurs") ?: 0f
             val simbolAsal = backStackEntry.arguments?.getString("simbolAsal") ?: ""
             val simbolTujuan = backStackEntry.arguments?.getString("simbolTujuan") ?: ""
             val tipe = backStackEntry.arguments?.getString("tipe") ?: ""
 
             EditScreen(
                 navController = navController,
-                id = id,
                 nama = nama,
                 nominalLama = nominal,
-                kurs = kurs,
                 simbolAsal = simbolAsal,
                 simbolTujuan = simbolTujuan,
                 tipeLama = tipe

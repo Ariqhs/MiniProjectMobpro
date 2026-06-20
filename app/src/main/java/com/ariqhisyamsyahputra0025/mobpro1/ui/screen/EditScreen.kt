@@ -1,13 +1,6 @@
 package com.ariqhisyamsyahputra0025.mobpro1.ui.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -15,28 +8,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -45,26 +21,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ariqhisyamsyahputra0025.mobpro1.R
-import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatDatabase
-import com.ariqhisyamsyahputra0025.mobpro1.database.RiwayatKonversi
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditScreen(
     navController: NavHostController,
-    id: Int,
     nama: String,
     nominalLama: Float,
-    kurs: Float,
     simbolAsal: String,
     simbolTujuan: String,
     tipeLama: String
 ) {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val dao = RiwayatDatabase.getDatabase(context).riwayatDao()
-
     val initialInput = if (nominalLama % 1.0f == 0f) nominalLama.toInt().toString() else nominalLama.toString()
     var inputAmount by rememberSaveable { mutableStateOf(initialInput) }
     var inputError by rememberSaveable { mutableStateOf(false) }
@@ -157,26 +124,7 @@ fun EditScreen(
                 onClick = {
                     inputError = (inputAmount.isBlank() || inputAmount == "0")
                     if (inputError) return@Button
-
-                    val amount = inputAmount.toFloatOrNull() ?: 0f
-
-                    val hasilBaru = when (selectedOption) {
-                        optAsalKeTujuan -> amount * kurs
-                        optTujuanKeAsal -> amount / kurs
-                        else -> 0f
-                    }
-
-                    scope.launch {
-                        val riwayatUpdate = RiwayatKonversi(
-                            id = id,
-                            mataUang = nama,
-                            nominal = amount,
-                            hasil = hasilBaru,
-                            tipeKonversi = selectedOption
-                        )
-                        dao.updateRiwayat(riwayatUpdate)
-                        navController.popBackStack()
-                    }
+                    navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)

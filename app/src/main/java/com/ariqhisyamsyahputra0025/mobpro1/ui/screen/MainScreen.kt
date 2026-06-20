@@ -10,7 +10,18 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -19,11 +30,40 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,12 +88,10 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.ariqhisyamsyahputra0025.mobpro1.BuildConfig
 import com.ariqhisyamsyahputra0025.mobpro1.R
+import com.ariqhisyamsyahputra0025.mobpro1.SettingPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.model.User
 import com.ariqhisyamsyahputra0025.mobpro1.navigation.Screen
-import com.ariqhisyamsyahputra0025.mobpro1.network.ApiState
-import com.ariqhisyamsyahputra0025.mobpro1.network.DiaryEntry
 import com.ariqhisyamsyahputra0025.mobpro1.network.UserDataStore
-import com.ariqhisyamsyahputra0025.mobpro1.SettingPreferences
 import com.ariqhisyamsyahputra0025.mobpro1.ui.MainViewModel
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
@@ -191,6 +229,7 @@ fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenContent(
     modifier: Modifier = Modifier,
@@ -199,12 +238,11 @@ fun ScreenContent(
     userEmail: String
 ) {
     val context = LocalContext.current
-    val pref = remember { SettingPreferences(context) }
-    val isGridLayout by pref.getLayoutSetting.collectAsState(initial = false)
-    val scope = rememberCoroutineScope()
+    remember { SettingPreferences(context) }
+    rememberCoroutineScope()
 
-    val diariesState by viewModel.diaries.collectAsState()
-    var itemToDelete by remember { mutableStateOf<DiaryEntry?>(null) }
+    val diaries by viewModel.diaries.collectAsState()
+    var itemToDelete by remember { mutableStateOf<com.ariqhisyamsyahputra0025.mobpro1.database.DiaryEntity?>(null) }
 
     val daftarMenu = listOf(
         MenuMataUang("Dollar", 16000f, "USD", "IDR", R.string.kurs_dollar, R.drawable.bg_btn_dollar),
@@ -250,13 +288,6 @@ fun ScreenContent(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        IconButton(onClick = { scope.launch { pref.saveLayoutSetting(!isGridLayout) } }) {
-                            Icon(
-                                imageVector = if (isGridLayout) Icons.AutoMirrored.Filled.List else Icons.Filled.GridView,
-                                contentDescription = "Ganti Tampilan",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
                     }
                     HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
 
@@ -267,76 +298,47 @@ fun ScreenContent(
                             color = Color.Gray,
                             modifier = Modifier.padding(vertical = 16.dp)
                         )
+                    } else if (diaries.isEmpty()) {
+                        Text(
+                            text = "Belum ada data diary. Tekan tombol + untuk menambah.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
                     }
                 }
             }
 
-            if (userEmail.isNotEmpty()) {
-                when (diariesState) {
-                    is ApiState.Loading -> {
-                        item(span = { GridItemSpan(2) }) {
-                            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator()
-                            }
+            items(
+                items = diaries,
+                key = { it.id },
+                span = { GridItemSpan(2) }
+            ) { diary ->
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = diary.localImagePath?.let { java.io.File(it) } ?: diary.imageUrl,
+                            contentDescription = diary.title,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = diary.title, fontWeight = FontWeight.Bold)
+                            Text(text = "${diary.foreignAmount} ${diary.currencyCode}")
+                            Text(text = "≈ Rp${diary.convertedIdr}")
+                        }
+                        IconButton(onClick = { itemToDelete = diary }) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Hapus")
                         }
                     }
-                    is ApiState.Error -> {
-                        item(span = { GridItemSpan(2) }) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Gagal mengambil data dari internet.")
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Button(onClick = { viewModel.getDiaries(userEmail) }) {
-                                    Text("Coba Lagi")
-                                }
-                            }
-                        }
-                    }
-                    is ApiState.Success -> {
-                        val diaries = (diariesState as ApiState.Success<List<DiaryEntry>>).data
-
-                        if (diaries.isEmpty()) {
-                            item(span = { GridItemSpan(2) }) {
-                                Text(
-                                    text = "Belum ada diary tersimpan.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Gray,
-                                    modifier = Modifier.padding(vertical = 16.dp)
-                                )
-                            }
-                        } else {
-                            items(
-                                items = diaries,
-                                key = { it.id },
-                                span = { GridItemSpan(if (isGridLayout) 1 else maxLineSpan) }
-                            ) { diary ->
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                                ) {
-                                    Column {
-                                        AsyncImage(
-                                            model = diary.imageUrl,
-                                            contentDescription = diary.title,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier.fillMaxWidth().height(120.dp)
-                                        )
-                                        Column(modifier = Modifier.padding(12.dp)) {
-                                            Text(text = diary.title, fontWeight = FontWeight.Bold)
-                                            Text(text = "${diary.currencyCode} ${diary.foreignAmount}")
-                                            Text(text = "Rp ${diary.convertedIdr}", color = MaterialTheme.colorScheme.primary)
-
-                                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                                                IconButton(onClick = { itemToDelete = diary }) {
-                                                    Icon(Icons.Filled.Delete, contentDescription = "Hapus", tint = Color.Red)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else -> {}
                 }
             }
 
@@ -430,7 +432,7 @@ fun AddDiaryDialog(
                                 text = { Text(option) },
                                 onClick = {
                                     currency = option
-                                    expanded = false // Tutup menu setelah dipilih
+                                    expanded = false
                                 }
                             )
                         }
